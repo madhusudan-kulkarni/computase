@@ -1,4 +1,4 @@
-"""Verified local bioinformatics computation."""
+"""Local DNA and RNA sequence utilities."""
 
 __version__ = "0.1.0"
 

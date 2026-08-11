@@ -4,6 +4,7 @@ from typing import Any
 
 from mcp.client.client import Client
 
+from computase import __version__
 from computase.mcp.server import server
 
 TOOL_NAMES = {
@@ -72,7 +73,7 @@ async def test_all_tools_return_structured_results() -> None:
         result = await _call(name, arguments)
         assert result.is_error is False, name
         assert result.structured_content
-        assert result.structured_content["computase_version"] == "0.1.0"
+        assert result.structured_content["computase_version"] == __version__
         assert "parameters" in result.structured_content
 
 

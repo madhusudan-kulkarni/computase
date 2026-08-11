@@ -26,4 +26,48 @@ jobs:
       - name: Test exact artifacts
         run: COMPUTASE_DIST_DIR=dist uv run --locked pytest -q
       - name: Publish exact artifacts
-        run: uv publish --trusted-publishing automatic dist/*
+        run: >
+          uv publish
+          --trusted-publishing automatic
+          --check-url https://pypi.org/simple/
+          dist/*
+      - name: Verify version on PyPI
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          uv run --locked python scripts/verify_pypi_release.py \
+            computase "${RELEASE_TAG#v}"
+
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create matching GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          if gh release create "$RELEASE_TAG" \
+            --verify-tag \
+            --title "Computase $version" \
+            --generate-notes; then
+            exit 0
+          fi
+          if state=$(gh release view "$RELEASE_TAG" \
+            --json tagName,isDraft,isPrerelease,publishedAt \
+            --jq '[.tagName, .isDraft, .isPrerelease, .publishedAt] | @tsv'); then
+            IFS=$'\t' read -r tag_name is_draft is_prerelease published_at <<< "$state"
+          fi
+          if [ "${tag_name:-}" = "$RELEASE_TAG" ] \
+            && [ "${is_draft:-}" = "false" ] \
+            && [ "${is_prerelease:-}" = "false" ] \
+            && [ -n "${published_at:-}" ]; then
+            echo "GitHub Release already exists: $RELEASE_TAG"
+          else
+            echo "GitHub Release is missing, draft, prerelease, or conflicting: $RELEASE_TAG" >&2
+            exit 1
+          fi

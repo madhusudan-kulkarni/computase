@@ -2,6 +2,7 @@
 """Validate tag, project metadata, changelog, and exact wheel metadata."""
 
 import argparse
+import json
 import re
 import sys
 import tomllib
@@ -10,6 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 _SEMVER_TAG = re.compile(r"^v(?P<version>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))$")
+_SOURCE_TAG_URL = re.compile(r"/archive/refs/tags/v(?P<version>[^/]+)\.tar\.gz$")
 
 
 def project_identity(pyproject: Path) -> tuple[str, str]:
@@ -46,6 +48,34 @@ def changelog_has_version(changelog: Path, version: str) -> bool:
     )
 
 
+def biotools_versions(path: Path) -> list[str]:
+    """Read the release and download versions from the bio.tools draft."""
+    records = json.loads(path.read_text())
+    if not isinstance(records, list) or len(records) != 1:
+        raise ValueError("bio.tools metadata must contain exactly one record")
+    record = records[0]
+    try:
+        release_versions = record["version"]
+        downloads = record["download"]
+        versions = [str(version) for version in release_versions]
+        source_tag_versions = []
+        for download in downloads:
+            versions.append(str(download["version"]))
+            if download["type"] == "Source code":
+                match = _SOURCE_TAG_URL.search(str(download["url"]))
+                if match is None:
+                    raise ValueError("bio.tools source download must use an immutable tag archive")
+                source_tag_versions.append(match.group("version"))
+    except (KeyError, TypeError) as error:
+        raise ValueError("bio.tools metadata has incomplete version declarations") from error
+    if len(source_tag_versions) != 1:
+        raise ValueError("bio.tools metadata must contain exactly one source tag archive")
+    versions.extend(source_tag_versions)
+    if not versions:
+        raise ValueError("bio.tools metadata has no version declarations")
+    return versions
+
+
 def declared_version(path: Path, pattern: str, label: str) -> str:
     """Read one version declaration from a text metadata file."""
     match = re.search(pattern, path.read_text(), re.MULTILINE)
@@ -62,6 +92,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--pyproject", type=Path, default=ROOT / "pyproject.toml")
     parser.add_argument("--changelog", type=Path, default=ROOT / "CHANGELOG.md")
     parser.add_argument("--citation", type=Path, default=ROOT / "CITATION.cff")
+    parser.add_argument(
+        "--biotools",
+        type=Path,
+        default=ROOT / "metadata" / "biotools.json",
+    )
     parser.add_argument(
         "--package-init",
         type=Path,
@@ -87,7 +122,8 @@ def main(argv: list[str] | None = None) -> int:
             r"^__version__\s*=\s*[\"'](?P<version>[^\"']+)",
             "package __init__.py",
         )
-    except ValueError as error:
+        metadata_versions = biotools_versions(args.biotools)
+    except (json.JSONDecodeError, ValueError) as error:
         print(f"check_release: {error}", file=sys.stderr)
         return 1
 
@@ -102,6 +138,10 @@ def main(argv: list[str] | None = None) -> int:
         (
             package_version == expected,
             f"package version {package_version} != tag {expected}",
+        ),
+        (
+            all(version == expected for version in metadata_versions),
+            f"bio.tools versions {metadata_versions} != tag {expected}",
         ),
         (
             changelog_has_version(args.changelog, expected),

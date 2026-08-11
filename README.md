@@ -20,8 +20,16 @@ not sent to a service.
 
 ## Install
 
+For most Python environments:
+
 ```bash
 pip install computase
+```
+
+For a project managed with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv add computase
 ```
 
 Python 3.11 or newer is required.
@@ -37,10 +45,10 @@ result = translate_sequence(sequence, table_id=1)
 print(result.model_dump())
 ```
 
-Representative output:
+Representative output (`computase_version` matches the installed release):
 
 ```text
-{'computase_version': '0.1.0', 'parameters': {'table_id': 1, 'stop_handling': 'translate-through'}, 'protein': 'MAIVMGR*KGAR*', 'table_id': 1, 'table_name': 'Standard', 'stop_handling': 'translate-through', 'codon_count': 13, 'stopped_early': False}
+{'computase_version': '<installed version>', 'parameters': {'table_id': 1, 'stop_handling': 'translate-through'}, 'protein': 'MAIVMGR*KGAR*', 'table_id': 1, 'table_name': 'Standard', 'stop_handling': 'translate-through', 'codon_count': 13, 'stopped_early': False}
 ```
 
 Results are typed Pydantic models. They record the Computase version and effective
@@ -58,6 +66,9 @@ parameters, but never echo the full input sequence.
 
 These checks establish the documented conventions and regression boundaries; they
 do not establish correctness for every biological interpretation or use case.
+If a result differs from an independent reference, use the
+[scientific correctness report](https://github.com/madhusudan-kulkarni/computase/issues/new?template=scientific-correctness.yml)
+with a minimized, non-sensitive sequence.
 
 ## Scientific scope and conventions
 
@@ -76,23 +87,31 @@ do not establish correctness for every biological interpretation or use case.
 
 ### stdio
 
+With uv installed, `uvx` can run the MCP server without installing Computase
+into the current environment:
+
 ```json
 {
   "mcpServers": {
     "computase": {
       "command": "uvx",
-      "args": ["--from", "computase", "computase"]
+      "args": ["computase"]
     }
   }
 }
 ```
+
+If Computase was installed with `pip` into an environment available to the MCP
+client, use `computase` as the command and omit the arguments. For a uv-managed
+project, run `uv run computase` from the project root; configure the MCP client
+with `uv` as the command and `["run", "computase"]` as the arguments.
 
 The five tools are `computase_summarize_sequence`, `computase_reverse_complement`, `computase_translate_sequence`, `computase_enumerate_orfs`, and `computase_scan_motif`.
 
 ### Streamable HTTP
 
 ```bash
-uvx --from computase computase --transport streamable-http --host 127.0.0.1 --port 8000
+uvx computase --transport streamable-http --host 127.0.0.1 --port 8000
 ```
 
 Connect an MCP client to `http://127.0.0.1:8000/mcp`. HTTP binds to localhost by default.
