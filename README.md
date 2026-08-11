@@ -147,4 +147,4 @@ repository**.
 
 ## License
 
-MIT. See `LICENSE`.
+Computase is licensed under the [MIT License](LICENSE).
