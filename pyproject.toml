@@ -2,6 +2,7 @@
 name = "computase"
 version = "0.1.0"
 description = "Verified local bioinformatics computation for Python and MCP."
+readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -54,6 +55,8 @@ packages = ["src/computase"]
 [tool.hatch.build.targets.sdist]
 include = [
     "src/computase",
+    "skills/computase",
+    "README.md",
     "LICENSE",
     "pyproject.toml",
 ]
