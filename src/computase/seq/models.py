@@ -48,3 +48,18 @@ class ReverseComplementResult(ProvenanceModel):
     reverse_complement: str = Field(
         description="Reverse complement in the same DNA or RNA alphabet."
     )
+
+
+class TranslationResult(ProvenanceModel):
+    """Protein translation under an NCBI genetic code."""
+
+    protein: str = Field(description="Translated protein, with stops represented as '*'.")
+    table_id: int = Field(description="NCBI genetic-code table identifier.")
+    table_name: str = Field(description="Primary NCBI genetic-code table name.")
+    stop_handling: Literal["translate-through", "truncate-at-first-stop"] = Field(
+        description="Effective stop-codon handling policy."
+    )
+    codon_count: int = Field(ge=1, description="Number of complete input codons.")
+    stopped_early: bool = Field(
+        description="Whether translation was truncated at an encountered stop codon."
+    )
