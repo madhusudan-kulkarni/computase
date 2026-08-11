@@ -64,6 +64,7 @@ def test_sdist_contains_public_sources_but_not_internal_suites(
 
     for required in (
         "src/computase",
+        "docs/python-examples.md",
         "skills/computase/SKILL.md",
         "skills/computase/references/usage-examples.md",
         "README.md",

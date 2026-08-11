@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-08-11
+
 - Improved scientist-facing installation guidance, scientific conventions, and
   correctness-reporting links.
 - Added concise Python examples for all five sequence operations.

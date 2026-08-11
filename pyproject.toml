@@ -1,6 +1,6 @@
 [project]
 name = "computase"
-version = "0.1.0"
+version = "0.1.1"
 description = "Local DNA and RNA sequence utilities for Python and MCP."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -58,6 +58,7 @@ packages = ["src/computase"]
 include = [
     "src/computase",
     "skills/computase",
+    "docs/python-examples.md",
     "README.md",
     "LICENSE",
     "pyproject.toml",
