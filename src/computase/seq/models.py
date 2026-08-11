@@ -88,3 +88,23 @@ class OrfEnumeration(ProvenanceModel):
         default="These are candidate ORFs, not gene predictions.",
         description="Scientific interpretation boundary.",
     )
+
+
+class MotifMatch(ProvenanceModel):
+    """One motif occurrence on the forward reference."""
+
+    start: int = Field(ge=0, description="Forward-reference start coordinate.")
+    end: int = Field(gt=0, description="Forward-reference end-exclusive coordinate.")
+    strand: Literal["+", "-", "both"] = Field(description="Matching motif orientation.")
+    matched_sequence: str = Field(description="Forward-reference sequence span.")
+
+
+class MotifScanResult(ProvenanceModel):
+    """Bounded motif scan result."""
+
+    motif: str = Field(description="Normalized IUPAC motif.")
+    strand: Literal["forward", "reverse", "both"] = Field(description="Requested strand policy.")
+    matches: list[MotifMatch] = Field(description="Motif occurrences in coordinate order.")
+    total_found: int = Field(ge=0, description="Total occurrences before result limiting.")
+    truncated: bool = Field(description="Whether occurrences were omitted by max_matches.")
+    coordinate_system: Literal["0-based-half-open"] = "0-based-half-open"
