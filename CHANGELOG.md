@@ -4,6 +4,7 @@
 
 - Hardened the companion Skill with an isolated `uv` fallback runner, a concise
   scientific presentation contract, and skills.sh installation guidance.
+- Registered Computase on bio.tools and persisted the published `biotoolsID`.
 
 ## [0.1.1] - 2026-08-11
 
