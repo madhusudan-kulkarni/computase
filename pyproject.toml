@@ -1,0 +1,71 @@
+[project]
+name = "computase"
+version = "0.1.0"
+description = "Verified local bioinformatics computation for Python and MCP."
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Madhusudan Kulkarni", email = "96856144+madhusudan-kulkarni@users.noreply.github.com" },
+]
+keywords = ["bioinformatics", "biopython", "mcp", "sequence-analysis"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "biopython>=1.84",
+    "mcp>=2.0.0",
+    "pydantic>=2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/madhusudan-kulkarni/computase"
+Issues = "https://github.com/madhusudan-kulkarni/computase/issues"
+Repository = "https://github.com/madhusudan-kulkarni/computase"
+
+[project.optional-dependencies]
+dev = [
+    "hypothesis>=6.0",
+    "mypy>=1.10",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/computase"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/computase",
+    "LICENSE",
+    "pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
