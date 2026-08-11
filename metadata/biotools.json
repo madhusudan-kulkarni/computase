@@ -1,0 +1,308 @@
+[
+  {
+    "name": "Computase",
+    "description": "Local Python sequence utilities for nucleotide composition, DNA and RNA reverse complements, NCBI genetic-code translation, six-frame candidate ORF enumeration, and IUPAC motif searches. Computase accepts raw nucleotide strings or one FASTA record and returns structured, bounded results with explicit scientific conventions.",
+    "homepage": "https://github.com/madhusudan-kulkarni/computase",
+    "version": [
+      "0.1.0"
+    ],
+    "toolType": [
+      "Library"
+    ],
+    "topic": [
+      {
+        "term": "Sequence analysis",
+        "uri": "http://edamontology.org/topic_0080"
+      },
+      {
+        "term": "Nucleic acids",
+        "uri": "http://edamontology.org/topic_0077"
+      }
+    ],
+    "operatingSystem": [
+      "Linux",
+      "Windows",
+      "Mac"
+    ],
+    "language": [
+      "Python"
+    ],
+    "license": "MIT",
+    "maturity": "Emerging",
+    "cost": "Free of charge",
+    "function": [
+      {
+        "operation": [
+          {
+            "term": "Sequence composition calculation",
+            "uri": "http://edamontology.org/operation_0236"
+          }
+        ],
+        "input": [
+          {
+            "data": {
+              "term": "Nucleic acid sequence",
+              "uri": "http://edamontology.org/data_2977"
+            },
+            "format": [
+              {
+                "term": "plain text format (unformatted)",
+                "uri": "http://edamontology.org/format_1964"
+              },
+              {
+                "term": "FASTA",
+                "uri": "http://edamontology.org/format_1929"
+              }
+            ]
+          }
+        ],
+        "output": [
+          {
+            "data": {
+              "term": "Sequence composition report",
+              "uri": "http://edamontology.org/data_1261"
+            },
+            "format": [
+              {
+                "term": "JSON",
+                "uri": "http://edamontology.org/format_3464"
+              }
+            ]
+          }
+        ],
+        "note": "Reports composition, ambiguity-preserving GC bounds, and concrete-base GC skew."
+      },
+      {
+        "operation": [
+          {
+            "term": "Reverse complement",
+            "uri": "http://edamontology.org/operation_0363"
+          }
+        ],
+        "input": [
+          {
+            "data": {
+              "term": "Nucleic acid sequence",
+              "uri": "http://edamontology.org/data_2977"
+            },
+            "format": [
+              {
+                "term": "plain text format (unformatted)",
+                "uri": "http://edamontology.org/format_1964"
+              },
+              {
+                "term": "FASTA",
+                "uri": "http://edamontology.org/format_1929"
+              }
+            ]
+          }
+        ],
+        "output": [
+          {
+            "data": {
+              "term": "Nucleic acid sequence",
+              "uri": "http://edamontology.org/data_2977"
+            },
+            "format": [
+              {
+                "term": "JSON",
+                "uri": "http://edamontology.org/format_3464"
+              }
+            ]
+          }
+        ],
+        "note": "Preserves the DNA or RNA alphabet and supports IUPAC ambiguity symbols."
+      },
+      {
+        "operation": [
+          {
+            "term": "DNA translation",
+            "uri": "http://edamontology.org/operation_0371"
+          }
+        ],
+        "input": [
+          {
+            "data": {
+              "term": "Nucleic acid sequence",
+              "uri": "http://edamontology.org/data_2977"
+            },
+            "format": [
+              {
+                "term": "plain text format (unformatted)",
+                "uri": "http://edamontology.org/format_1964"
+              },
+              {
+                "term": "FASTA",
+                "uri": "http://edamontology.org/format_1929"
+              }
+            ]
+          }
+        ],
+        "output": [
+          {
+            "data": {
+              "term": "Protein sequence",
+              "uri": "http://edamontology.org/data_2976"
+            },
+            "format": [
+              {
+                "term": "JSON",
+                "uri": "http://edamontology.org/format_3464"
+              }
+            ]
+          }
+        ],
+        "note": "Translates complete DNA or RNA codons with a selected NCBI genetic-code table."
+      },
+      {
+        "operation": [
+          {
+            "term": "Sequence feature detection",
+            "uri": "http://edamontology.org/operation_0253"
+          }
+        ],
+        "input": [
+          {
+            "data": {
+              "term": "Nucleic acid sequence",
+              "uri": "http://edamontology.org/data_2977"
+            },
+            "format": [
+              {
+                "term": "plain text format (unformatted)",
+                "uri": "http://edamontology.org/format_1964"
+              },
+              {
+                "term": "FASTA",
+                "uri": "http://edamontology.org/format_1929"
+              }
+            ]
+          }
+        ],
+        "output": [
+          {
+            "data": {
+              "term": "Sequence features",
+              "uri": "http://edamontology.org/data_1255"
+            },
+            "format": [
+              {
+                "term": "JSON",
+                "uri": "http://edamontology.org/format_3464"
+              }
+            ]
+          }
+        ],
+        "note": "Enumerates sequence-defined candidate ORFs in six frames; it does not predict genes."
+      },
+      {
+        "operation": [
+          {
+            "term": "Sequence motif recognition",
+            "uri": "http://edamontology.org/operation_0239"
+          }
+        ],
+        "input": [
+          {
+            "data": {
+              "term": "Nucleic acid sequence",
+              "uri": "http://edamontology.org/data_2977"
+            },
+            "format": [
+              {
+                "term": "plain text format (unformatted)",
+                "uri": "http://edamontology.org/format_1964"
+              },
+              {
+                "term": "FASTA",
+                "uri": "http://edamontology.org/format_1929"
+              }
+            ]
+          },
+          {
+            "data": {
+              "term": "Sequence motif",
+              "uri": "http://edamontology.org/data_1353"
+            },
+            "format": [
+              {
+                "term": "plain text format (unformatted)",
+                "uri": "http://edamontology.org/format_1964"
+              }
+            ]
+          }
+        ],
+        "output": [
+          {
+            "data": {
+              "term": "Sequence features",
+              "uri": "http://edamontology.org/data_1255"
+            },
+            "format": [
+              {
+                "term": "JSON",
+                "uri": "http://edamontology.org/format_3464"
+              }
+            ]
+          }
+        ],
+        "note": "Finds overlapping IUPAC motif matches on the forward, reverse, or both strands."
+      }
+    ],
+    "link": [
+      {
+        "url": "https://github.com/madhusudan-kulkarni/computase",
+        "type": [
+          "Repository"
+        ]
+      },
+      {
+        "url": "https://github.com/madhusudan-kulkarni/computase/issues",
+        "type": [
+          "Issue tracker"
+        ]
+      }
+    ],
+    "download": [
+      {
+        "url": "https://pypi.org/project/computase/",
+        "type": "Software package",
+        "version": "0.1.0"
+      },
+      {
+        "url": "https://github.com/madhusudan-kulkarni/computase",
+        "type": "Source code",
+        "version": "0.1.0"
+      }
+    ],
+    "documentation": [
+      {
+        "url": "https://github.com/madhusudan-kulkarni/computase#readme",
+        "type": [
+          "General",
+          "Installation instructions",
+          "Quick start guide",
+          "Citation instructions"
+        ]
+      },
+      {
+        "url": "https://github.com/madhusudan-kulkarni/computase/blob/main/CHANGELOG.md",
+        "type": [
+          "Release notes"
+        ]
+      }
+    ],
+    "credit": [
+      {
+        "name": "Madhusudan Kulkarni",
+        "email": "96856144+madhusudan-kulkarni@users.noreply.github.com",
+        "typeEntity": "Person",
+        "typeRole": [
+          "Developer",
+          "Maintainer",
+          "Primary contact"
+        ]
+      }
+    ]
+  }
+]

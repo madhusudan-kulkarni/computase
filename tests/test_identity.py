@@ -1,6 +1,9 @@
+import json
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
 PUBLIC_MARKDOWN = {
     "README.md",
     "CHANGELOG.md",
@@ -42,3 +45,13 @@ def test_citation_matches_release_identity() -> None:
     assert 'title: "Computase"' in citation
     assert "version: 0.1.0" in citation
     assert "license: MIT" in citation
+
+
+def test_biotools_draft_matches_release_identity() -> None:
+    records = json.loads((ROOT / "metadata" / "biotools.json").read_text())
+
+    assert len(records) == 1
+    assert records[0]["name"] == "Computase"
+    assert records[0]["version"] == [PROJECT_VERSION]
+    assert records[0]["license"] == "MIT"
+    assert len(records[0]["function"]) == 5

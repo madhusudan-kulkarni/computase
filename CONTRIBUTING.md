@@ -10,11 +10,11 @@ uv sync --locked --extra dev
 
 ```bash
 uv lock --check
-uv run ruff format --check src tests evaluations
-uv run ruff check src tests evaluations
-uv run mypy src tests evaluations
-uv run pytest -q
-uv run python -m evaluations.runner
+uv run --locked ruff format --check src tests evaluations scripts
+uv run --locked ruff check src tests evaluations scripts
+uv run --locked mypy src tests evaluations scripts
+uv run --locked pytest -q
+uv run --locked python -m evaluations.runner
 ```
 
 ## Conventions

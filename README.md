@@ -1,16 +1,22 @@
 # Computase
 
-Verified local bioinformatics computation.
+[![PyPI](https://img.shields.io/pypi/v/computase)](https://pypi.org/project/computase/)
+[![Python](https://img.shields.io/pypi/pyversions/computase)](https://pypi.org/project/computase/)
+[![CI](https://github.com/madhusudan-kulkarni/computase/actions/workflows/ci.yml/badge.svg)](https://github.com/madhusudan-kulkarni/computase/actions/workflows/ci.yml)
 
-Computase provides five sequence operations through equally supported Python and MCP interfaces:
+Computase is a local Python library for small, well-defined DNA and RNA sequence
+calculations:
 
-- sequence composition, GC bounds, and GC skew
-- DNA/RNA reverse complements
-- translation with selectable NCBI genetic codes
+- nucleotide composition, GC bounds, and GC skew
+- DNA or RNA reverse complements
+- translation with selectable NCBI genetic-code tables
 - six-frame candidate ORF enumeration
-- IUPAC motif scanning on either strand
+- IUPAC motif searches on either strand
 
-Computase is sequence-only in 0.1.0. It does not predict genes, fetch remote records, run alignments, or provide generic statistics.
+The Python API is the primary interface. The same operations are also available
+through the optional [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
+interface for local agent workflows. Computation runs locally; input sequences are
+not sent to a service.
 
 ## Install
 
@@ -18,29 +24,64 @@ Computase is sequence-only in 0.1.0. It does not predict genes, fetch remote rec
 pip install computase
 ```
 
-Python 3.11 or newer is required. Computation is local; input sequences are not sent to a service.
+Python 3.11 or newer is required.
 
-## Python
+## Quick start
 
 ```python
-from computase.seq import reverse_complement, summarize_sequence
+from computase.seq import translate_sequence
 
-summary = summarize_sequence(">example\nAAGCSWN\n")
-print(summary.gc_min_percent, summary.gc_max_percent)
+sequence = ">synthetic-cds\nATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG\n"
+result = translate_sequence(sequence, table_id=1)
 
-result = reverse_complement("AUGC")
-print(result.reverse_complement)
+print(result.model_dump())
 ```
 
-All operations accept raw sequences or one FASTA record. Results include the Computase version and effective parameters but never echo the full input sequence.
+Representative output:
 
-## MCP over stdio
+```text
+{'computase_version': '0.1.0', 'parameters': {'table_id': 1, 'stop_handling': 'translate-through'}, 'protein': 'MAIVMGR*KGAR*', 'table_id': 1, 'table_name': 'Standard', 'stop_handling': 'translate-through', 'codon_count': 13, 'stopped_early': False}
+```
+
+Results are typed Pydantic models. They record the Computase version and effective
+parameters, but never echo the full input sequence.
+
+## Capabilities and validation
+
+| Scientific task | Python function | Contract and validation evidence |
+| --- | --- | --- |
+| Composition, GC content bounds, and GC skew | `summarize_sequence` | Preserves IUPAC uncertainty; checked against the GenBank HBB coding sequence and composition/property invariants |
+| DNA/RNA reverse complement | `reverse_complement` | Preserves the input alphabet and IUPAC symbols; checked against an M13 reference sequence and the reverse-complement involution property |
+| NCBI genetic-code translation | `translate_sequence` | Uses a selected NCBI table and requires complete codons; checked against an NCBI translation example and table-specific codons |
+| Six-frame candidate ORF enumeration | `enumerate_orfs` | Reports forward-reference coordinates and explicit start, stop, and nesting policies; checked with synthetic fixtures spanning all six frames and coordinate round trips |
+| IUPAC motif search | `scan_motif` | Supports ambiguous symbols, overlapping matches, and either strand; checked against the pUC19 EcoRI site and interval/property tests |
+
+These checks establish the documented conventions and regression boundaries; they
+do not establish correctness for every biological interpretation or use case.
+
+## Scientific scope and conventions
+
+- Inputs are raw nucleotide strings or a single FASTA record, not multi-record files.
+- Coordinates are 0-based and end-exclusive on the normalized forward reference,
+  after FASTA headers and whitespace are removed.
+- Strand is reported separately; `normalized_sequence[start:end]` reproduces each
+  reported forward span.
+- ORFs are sequence candidates, not gene predictions.
+- IUPAC GC bounds preserve uncertainty rather than assigning probabilities.
+- Sequence length is capped at 5,000,000 nucleotides; motif and result limits are
+  enforced.
+- Computase 0.1.x does not fetch records, align sequences, or annotate genes.
+
+## Optional MCP interface
+
+### stdio
 
 ```json
 {
   "mcpServers": {
     "computase": {
-      "command": "computase"
+      "command": "uvx",
+      "args": ["--from", "computase", "computase"]
     }
   }
 }
@@ -48,22 +89,17 @@ All operations accept raw sequences or one FASTA record. Results include the Com
 
 The five tools are `computase_summarize_sequence`, `computase_reverse_complement`, `computase_translate_sequence`, `computase_enumerate_orfs`, and `computase_scan_motif`.
 
-## MCP over streamable HTTP
+### Streamable HTTP
 
 ```bash
-computase --transport streamable-http --host 127.0.0.1 --port 8000
+uvx --from computase computase --transport streamable-http --host 127.0.0.1 --port 8000
 ```
 
 Connect an MCP client to `http://127.0.0.1:8000/mcp`. HTTP binds to localhost by default.
 
-## Scientific conventions
-
-- Coordinates are 0-based and end-exclusive on the forward reference.
-- Coordinates index the normalized sequence after FASTA headers and whitespace are removed.
-- Strand is reported separately; `normalized_sequence[start:end]` reproduces each forward span.
-- ORFs are candidates, not gene predictions.
-- IUPAC GC bounds preserve uncertainty rather than assigning probabilities.
-- Sequence length is capped at 5,000,000 nucleotides; motif and result limits are enforced.
+Do not expose the Computase HTTP server directly to a public network. Non-loopback
+deployment requires a separately managed TLS boundary that authenticates every
+request and enforces request-size, concurrency, and rate limits.
 
 ## Companion Skill
 
@@ -74,14 +110,21 @@ Connect an MCP client to `http://127.0.0.1:8000/mcp`. HTTP binds to localhost by
 Use `uv sync --locked --extra dev`, then run:
 
 ```bash
-uv run ruff format --check src tests evaluations
-uv run ruff check src tests evaluations
-uv run mypy src tests evaluations
-uv run pytest -q
-uv run python -m evaluations.runner
+uv lock --check
+uv run --locked ruff format --check src tests evaluations scripts
+uv run --locked ruff check src tests evaluations scripts
+uv run --locked mypy src tests evaluations scripts
+uv run --locked pytest -q
+uv run --locked python -m evaluations.runner
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for reference-vector requirements.
+
+## Citation
+
+If Computase contributes to your work, cite the software metadata in
+[CITATION.cff](CITATION.cff). GitHub also exposes this through **Cite this
+repository**.
 
 ## License
 
