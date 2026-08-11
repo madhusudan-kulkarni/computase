@@ -1,0 +1,29 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install locked environment
+        run: uv sync --locked --extra dev
+      - name: Build exact artifacts
+        run: uv build
+      - name: Validate release identity
+        run: uv run --locked python scripts/check_release.py --tag "${GITHUB_REF_NAME}"
+      - name: Test exact artifacts
+        run: uv run --locked pytest -q
+      - name: Publish exact artifacts
+        run: uv publish --trusted-publishing automatic dist/*
