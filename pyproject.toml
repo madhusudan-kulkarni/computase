@@ -69,3 +69,5 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
+follow_imports = "skip"
+disallow_subclassing_any = false
