@@ -164,7 +164,8 @@ for reference-vector requirements.
 
 If Computase contributes to your work, cite the software metadata in
 [CITATION.cff](https://github.com/madhusudan-kulkarni/computase/blob/main/CITATION.cff).
-GitHub also exposes this through **Cite this repository**.
+GitHub also exposes this through **Cite this repository**. Computase is also
+registered on [bio.tools](https://bio.tools/computase).
 
 ## License
 

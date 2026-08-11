@@ -1,6 +1,7 @@
 [
   {
     "name": "Computase",
+    "biotoolsID": "computase",
     "description": "Local Python sequence utilities for nucleotide composition, DNA and RNA reverse complements, NCBI genetic-code translation, six-frame candidate ORF enumeration, and IUPAC motif searches. Computase accepts raw nucleotide strings or one FASTA record and returns structured, bounded results with explicit scientific conventions.",
     "homepage": "https://github.com/madhusudan-kulkarni/computase",
     "version": [

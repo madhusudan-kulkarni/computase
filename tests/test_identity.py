@@ -65,6 +65,7 @@ def test_biotools_draft_matches_release_identity() -> None:
 
     assert len(records) == 1
     assert records[0]["name"] == "Computase"
+    assert records[0]["biotoolsID"] == "computase"
     assert records[0]["version"] == [PROJECT_VERSION]
     assert records[0]["license"] == "MIT"
     assert len(records[0]["function"]) == 5
