@@ -125,7 +125,11 @@ request and enforces request-size, concurrency, and rate limits.
 
 ## Companion Skill
 
-`skills/computase/SKILL.md` teaches agents when and how to choose the five MCP tools. Longer examples are in `skills/computase/references/usage-examples.md`.
+The repository and source distribution include a
+[Computase companion Skill](https://github.com/madhusudan-kulkarni/computase/blob/main/skills/computase/SKILL.md)
+that teaches agents when and how to choose the five MCP tools. Its
+[usage examples](https://github.com/madhusudan-kulkarni/computase/blob/main/skills/computase/references/usage-examples.md)
+cover longer workflows. These Skill files are not installed by the Python wheel.
 
 ## Development
 
