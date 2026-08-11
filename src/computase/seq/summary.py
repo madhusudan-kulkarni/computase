@@ -1,6 +1,7 @@
 """Nucleotide composition and uncertainty-preserving GC summaries."""
 
 from collections import Counter
+from itertools import pairwise
 
 from computase.core.validation import normalize_sequence
 
@@ -32,7 +33,7 @@ def summarize_sequence(sequence: str) -> SequenceSummary:
     normalized = normalize_sequence(sequence)
     residues = normalized.sequence
     composition = dict(Counter(residues))
-    dinucleotides = dict(Counter(residues[index : index + 2] for index in range(len(residues) - 1)))
+    dinucleotides = dict(Counter(map("".join, pairwise(residues))))
 
     determinate_count = sum(composition.get(code, 0) for code in _DEFINITE_GC | _DEFINITE_AT)
     definite_gc_count = sum(composition.get(code, 0) for code in _DEFINITE_GC)

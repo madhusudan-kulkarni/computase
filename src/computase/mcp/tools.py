@@ -1,11 +1,18 @@
 """Thin MCP adapters over the public Computase Python API."""
 
+import asyncio
 from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import Field
 
+from computase.core.validation import (
+    MAX_MOTIF_MATCHES,
+    MAX_MOTIF_PATTERN_LENGTH,
+    MAX_ORF_RESULTS,
+    MAX_SEQUENCE_LENGTH,
+)
 from computase.errors import InvalidParameterError, InvalidSequenceError
 from computase.seq import (
     MotifScanResult,
@@ -24,7 +31,10 @@ NucleotideSequence = Annotated[
     str,
     Field(
         min_length=1,
-        description="Raw nucleotide sequence or one FASTA record; IUPAC codes are accepted.",
+        description=(
+            "Raw nucleotide sequence or one FASTA record; IUPAC codes are accepted. "
+            f"The normalized sequence is limited to {MAX_SEQUENCE_LENGTH:,} nucleotides."
+        ),
     ),
 ]
 _ANNOTATIONS = {
@@ -51,7 +61,7 @@ def register_tools(server: MCPServer) -> None:
     )
     async def summarize(sequence: NucleotideSequence) -> SequenceSummary:
         try:
-            return summarize_sequence(sequence)
+            return await asyncio.to_thread(summarize_sequence, sequence)
         except (InvalidSequenceError, InvalidParameterError) as error:
             raise _tool_error(error) from None
 
@@ -64,7 +74,7 @@ def register_tools(server: MCPServer) -> None:
     )
     async def complement(sequence: NucleotideSequence) -> ReverseComplementResult:
         try:
-            return reverse_complement(sequence)
+            return await asyncio.to_thread(reverse_complement, sequence)
         except (InvalidSequenceError, InvalidParameterError) as error:
             raise _tool_error(error) from None
 
@@ -87,7 +97,8 @@ def register_tools(server: MCPServer) -> None:
         ] = "translate-through",
     ) -> TranslationResult:
         try:
-            return translate_sequence(
+            return await asyncio.to_thread(
+                translate_sequence,
                 sequence,
                 table_id=table_id,
                 stop_handling=stop_handling,
@@ -126,11 +137,17 @@ def register_tools(server: MCPServer) -> None:
         ] = 30,
         max_results: Annotated[
             int,
-            Field(default=1000, ge=1, le=10_000, description="Maximum returned candidates."),
+            Field(
+                default=1000,
+                ge=1,
+                le=MAX_ORF_RESULTS,
+                description="Maximum returned candidates.",
+            ),
         ] = 1000,
     ) -> OrfEnumeration:
         try:
-            return enumerate_orfs(
+            return await asyncio.to_thread(
+                enumerate_orfs,
                 sequence,
                 table_id=table_id,
                 start_codons=start_codons,
@@ -155,7 +172,7 @@ def register_tools(server: MCPServer) -> None:
             str,
             Field(
                 min_length=1,
-                max_length=500,
+                max_length=MAX_MOTIF_PATTERN_LENGTH,
                 description="IUPAC nucleotide pattern.",
             ),
         ],
@@ -169,11 +186,17 @@ def register_tools(server: MCPServer) -> None:
         ] = True,
         max_matches: Annotated[
             int,
-            Field(default=10_000, ge=1, le=100_000, description="Maximum returned sites."),
+            Field(
+                default=10_000,
+                ge=1,
+                le=MAX_MOTIF_MATCHES,
+                description="Maximum returned sites.",
+            ),
         ] = 10_000,
     ) -> MotifScanResult:
         try:
-            return scan_motif(
+            return await asyncio.to_thread(
+                scan_motif,
                 sequence,
                 motif,
                 strand=strand,

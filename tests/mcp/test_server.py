@@ -77,16 +77,21 @@ async def test_all_tools_return_structured_results() -> None:
 
 
 async def test_public_validation_errors_are_actionable_tool_errors() -> None:
-    invalid_sequence = await _call(
-        "computase_reverse_complement",
-        {"sequence": "AUTG"},
-    )
-    invalid_parameter = await _call(
-        "computase_translate_sequence",
-        {"sequence": "ATG", "table_id": 9999},
-    )
+    cases: dict[str, tuple[dict[str, Any], str]] = {
+        "computase_summarize_sequence": ({"sequence": "AUTG"}, "both T and U"),
+        "computase_reverse_complement": ({"sequence": "AUTG"}, "both T and U"),
+        "computase_translate_sequence": (
+            {"sequence": "ATG", "table_id": 9999},
+            "table_id",
+        ),
+        "computase_enumerate_orfs": (
+            {"sequence": "ATG", "table_id": 9999},
+            "table_id",
+        ),
+        "computase_scan_motif": ({"sequence": "ATG", "motif": "X"}, "motif"),
+    }
 
-    assert invalid_sequence.is_error is True
-    assert "both T and U" in invalid_sequence.content[0].text
-    assert invalid_parameter.is_error is True
-    assert "table_id" in invalid_parameter.content[0].text
+    for name, (arguments, expected_message) in cases.items():
+        result = await _call(name, arguments)
+        assert result.is_error is True
+        assert expected_message in result.content[0].text

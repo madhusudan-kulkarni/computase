@@ -24,6 +24,10 @@ def test_reverse_complement_preserves_rna_alphabet_and_iupac_codes() -> None:
     assert result.reverse_complement == "RYGCAU"
 
 
+def test_reverse_complement_fasta_matches_raw_input() -> None:
+    assert reverse_complement(">record\nATG C\n") == reverse_complement("ATGC")
+
+
 def test_reverse_complement_rejects_mixed_t_and_u() -> None:
     with pytest.raises(InvalidSequenceError, match="both T and U"):
         reverse_complement("AUTG")

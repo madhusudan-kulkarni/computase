@@ -1,7 +1,9 @@
 import asyncio
+import os
 import socket
 import subprocess
 import tarfile
+import tomllib
 import zipfile
 from pathlib import Path
 
@@ -11,20 +13,34 @@ from mcp.client.stdio import StdioServerParameters, stdio_client
 from mcp.client.streamable_http import streamable_http_client
 
 ROOT = Path(__file__).resolve().parents[2]
+PROJECT = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+PROJECT_NAME = str(PROJECT["name"])
+PROJECT_VERSION = str(PROJECT["version"])
 
 
 @pytest.fixture(scope="module")  # type: ignore[untyped-decorator]
 def artifacts(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, Path]:
-    output = tmp_path_factory.mktemp("dist")
-    build = subprocess.run(
-        ["uv", "build", "--out-dir", str(output)],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert build.returncode == 0, build.stderr
-    return next(output.glob("*.whl")), next(output.glob("*.tar.gz"))
+    configured_dist = os.environ.get("COMPUTASE_DIST_DIR")
+    if configured_dist:
+        output = Path(configured_dist)
+        if not output.is_absolute():
+            output = ROOT / output
+    else:
+        output = tmp_path_factory.mktemp("dist")
+        build = subprocess.run(
+            ["uv", "build", "--out-dir", str(output)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert build.returncode == 0, build.stderr
+
+    wheels = list(output.glob("*.whl"))
+    sdists = list(output.glob("*.tar.gz"))
+    assert len(wheels) == 1
+    assert len(sdists) == 1
+    return wheels[0], sdists[0]
 
 
 def test_wheel_is_lean_and_typed(artifacts: tuple[Path, Path]) -> None:
@@ -32,7 +48,8 @@ def test_wheel_is_lean_and_typed(artifacts: tuple[Path, Path]) -> None:
     with zipfile.ZipFile(wheel) as archive:
         names = archive.namelist()
 
-    package_files = [name for name in names if not name.startswith("computase-0.1.0.dist-info/")]
+    dist_info = f"{PROJECT_NAME.replace('-', '_')}-{PROJECT_VERSION}.dist-info/"
+    package_files = [name for name in names if not name.startswith(dist_info)]
     assert package_files
     assert all(name.startswith("computase/") for name in package_files)
     assert "computase/py.typed" in package_files
@@ -72,9 +89,30 @@ def test_built_wheel_imports_in_isolated_environment(artifacts: tuple[Path, Path
             (
                 "import computase; "
                 "from computase.seq import reverse_complement; "
-                "assert computase.__version__ == '0.1.0'; "
+                f"assert computase.__version__ == {PROJECT_VERSION!r}; "
                 "assert reverse_complement('ATGC').reverse_complement == 'GCAT'"
             ),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert smoke.returncode == 0, smoke.stderr
+
+
+def test_built_sdist_imports_in_isolated_environment(artifacts: tuple[Path, Path]) -> None:
+    _, sdist = artifacts
+    smoke = subprocess.run(
+        [
+            "uv",
+            "run",
+            "--isolated",
+            "--with",
+            str(sdist),
+            "python",
+            "-c",
+            f"import computase; assert computase.__version__ == {PROJECT_VERSION!r}",
         ],
         cwd=ROOT,
         capture_output=True,

@@ -8,6 +8,7 @@ from computase.errors import InvalidSequenceError
 MAX_SEQUENCE_LENGTH = 5_000_000
 MAX_MOTIF_PATTERN_LENGTH = 500
 MAX_ORF_RESULTS = 10_000
+MAX_ORF_PROTEIN_RESIDUES = 5_000_000
 MAX_MOTIF_MATCHES = 100_000
 
 IUPAC_DNA = frozenset("ACGTRYSWKMBDHVN")
@@ -22,21 +23,30 @@ class NormalizedSequence:
     sequence_type: Literal["dna", "rna"]
 
 
-def _strip_fasta(sequence: str) -> str:
+def _strip_fasta(sequence: str, max_length: int) -> str:
     text = sequence.strip()
     if not text:
         raise InvalidSequenceError("sequence is empty; provide at least one nucleotide")
 
-    if not text.startswith(">"):
-        return "".join(text.split())
+    payload = text
+    if text.startswith(">"):
+        lines = text.splitlines()
+        if any(line.lstrip().startswith(">") for line in lines[1:]):
+            raise InvalidSequenceError(
+                "sequence contains multiple FASTA records; submit one record at a time"
+            )
+        payload = "\n".join(lines[1:])
 
-    lines = text.splitlines()
-    records = [line for line in lines[1:] if line.lstrip().startswith(">")]
-    if records:
-        raise InvalidSequenceError(
-            "sequence contains multiple FASTA records; submit one record at a time"
-        )
-    return "".join("".join(lines[1:]).split())
+    residues: list[str] = []
+    for character in payload:
+        if character.isspace():
+            continue
+        residues.append(character)
+        if len(residues) > max_length:
+            raise InvalidSequenceError(
+                f"sequence length exceeds {max_length:,} nucleotides; maximum is {max_length:,}"
+            )
+    return "".join(residues)
 
 
 def normalize_sequence(
@@ -51,15 +61,11 @@ def normalize_sequence(
     alphabet. Inputs longer than ``max_length`` and mixed T/U alphabets are
     rejected.
     """
-    normalized = _strip_fasta(sequence).upper()
+    normalized = _strip_fasta(sequence, max_length).upper()
     if not normalized:
         raise InvalidSequenceError(
             "sequence is empty after removing the FASTA header and whitespace; "
             "provide at least one nucleotide"
-        )
-    if len(normalized) > max_length:
-        raise InvalidSequenceError(
-            f"sequence length is {len(normalized):,}; maximum is {max_length:,} nucleotides"
         )
     if "T" in normalized and "U" in normalized:
         raise InvalidSequenceError(

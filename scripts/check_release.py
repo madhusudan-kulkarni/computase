@@ -46,6 +46,14 @@ def changelog_has_version(changelog: Path, version: str) -> bool:
     )
 
 
+def declared_version(path: Path, pattern: str, label: str) -> str:
+    """Read one version declaration from a text metadata file."""
+    match = re.search(pattern, path.read_text(), re.MULTILINE)
+    if match is None:
+        raise ValueError(f"{label} has no version declaration")
+    return match.group("version")
+
+
 def main(argv: list[str] | None = None) -> int:
     """Run release consistency checks."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -53,6 +61,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dist", type=Path, default=ROOT / "dist")
     parser.add_argument("--pyproject", type=Path, default=ROOT / "pyproject.toml")
     parser.add_argument("--changelog", type=Path, default=ROOT / "CHANGELOG.md")
+    parser.add_argument("--citation", type=Path, default=ROOT / "CITATION.cff")
+    parser.add_argument(
+        "--package-init",
+        type=Path,
+        default=ROOT / "src" / "computase" / "__init__.py",
+    )
     args = parser.parse_args(argv)
 
     match = _SEMVER_TAG.fullmatch(args.tag)
@@ -63,6 +77,16 @@ def main(argv: list[str] | None = None) -> int:
     project_name, project_version = project_identity(args.pyproject)
     try:
         wheel_name, wheel_version = wheel_identity(args.dist, project_name)
+        citation_version = declared_version(
+            args.citation,
+            r"^version:\s*[\"']?(?P<version>[^\"'\s]+)",
+            "CITATION.cff",
+        )
+        package_version = declared_version(
+            args.package_init,
+            r"^__version__\s*=\s*[\"'](?P<version>[^\"']+)",
+            "package __init__.py",
+        )
     except ValueError as error:
         print(f"check_release: {error}", file=sys.stderr)
         return 1
@@ -71,6 +95,14 @@ def main(argv: list[str] | None = None) -> int:
         (project_version == expected, f"project version {project_version} != tag {expected}"),
         (wheel_name == project_name, f"wheel name {wheel_name} != project {project_name}"),
         (wheel_version == expected, f"wheel version {wheel_version} != tag {expected}"),
+        (
+            citation_version == expected,
+            f"citation version {citation_version} != tag {expected}",
+        ),
+        (
+            package_version == expected,
+            f"package version {package_version} != tag {expected}",
+        ),
         (
             changelog_has_version(args.changelog, expected),
             f"CHANGELOG.md has no [{expected}] section",

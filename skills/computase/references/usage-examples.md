@@ -20,9 +20,25 @@ scan_motif("TTGAATTCAA", "GAATTC", strand="both")
 
 ## MCP arguments
 
+### `computase_summarize_sequence`
+
+```json
+{"sequence": ">record\nAAGCSWN\n"}
+```
+
+### `computase_reverse_complement`
+
+```json
+{"sequence": "AUGC"}
+```
+
+### `computase_translate_sequence`
+
 ```json
 {"sequence": "ATGGCC", "table_id": 1, "stop_handling": "translate-through"}
 ```
+
+### `computase_enumerate_orfs`
 
 ```json
 {
@@ -35,6 +51,8 @@ scan_motif("TTGAATTCAA", "GAATTC", strand="both")
   "max_results": 1000
 }
 ```
+
+### `computase_scan_motif`
 
 ```json
 {
