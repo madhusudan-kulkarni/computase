@@ -23,7 +23,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 dependencies = [
-    "biopython>=1.84",
+    "biopython>=1.88",
     "mcp>=2.0.0",
     "pydantic>=2.0",
 ]
