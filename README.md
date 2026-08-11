@@ -127,9 +127,22 @@ request and enforces request-size, concurrency, and rate limits.
 
 The repository and source distribution include a
 [Computase companion Skill](https://github.com/madhusudan-kulkarni/computase/blob/main/skills/computase/SKILL.md)
-that teaches agents when and how to choose the five MCP tools. Its
+that teaches agents when and how to choose the five operations. Prefer the
+Computase MCP tools when configured; otherwise the Skill can run an isolated
+`uv` fallback that resolves Computase without mutating the active environment.
+Its
 [usage examples](https://github.com/madhusudan-kulkarni/computase/blob/main/skills/computase/references/usage-examples.md)
-cover longer workflows. These Skill files are not installed by the Python wheel.
+cover MCP, runner, and Python workflows. These Skill files are not installed by
+the Python wheel.
+
+Install the Skill into a supported agent with:
+
+```bash
+npx skills add madhusudan-kulkarni/computase --skill computase
+```
+
+skills.sh indexes public repositories from install telemetry. There is no
+separate submission form.
 
 ## Development
 
@@ -137,9 +150,9 @@ Use `uv sync --locked --extra dev`, then run:
 
 ```bash
 uv lock --check
-uv run --locked ruff format --check src tests evaluations scripts
-uv run --locked ruff check src tests evaluations scripts
-uv run --locked mypy src tests evaluations scripts
+uv run --locked ruff format --check src tests evaluations scripts skills/computase/scripts
+uv run --locked ruff check src tests evaluations scripts skills/computase/scripts
+uv run --locked mypy src tests evaluations scripts skills/computase/scripts
 uv run --locked pytest -q
 uv run --locked python -m evaluations.runner
 ```
