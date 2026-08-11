@@ -27,6 +27,9 @@ dependencies = [
     "pydantic>=2.0",
 ]
 
+[project.scripts]
+computase = "computase.mcp.server:main"
+
 [project.urls]
 Homepage = "https://github.com/madhusudan-kulkarni/computase"
 Issues = "https://github.com/madhusudan-kulkarni/computase/issues"
