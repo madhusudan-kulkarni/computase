@@ -11,7 +11,7 @@ server = MCPServer(
     "computase",
     title="Computase",
     description=(
-        "Verified local bioinformatics computation: sequence summaries, reverse complements, "
+        "Local DNA and RNA sequence utilities: sequence summaries, reverse complements, "
         "translation, candidate ORF enumeration, and motif scanning."
     ),
     version=__version__,

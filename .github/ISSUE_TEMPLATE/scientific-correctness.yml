@@ -1,0 +1,84 @@
+name: Scientific correctness report
+description: Report a result that differs from a documented convention or independent reference
+title: "[Scientific correctness]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping verify Computase's scientific behavior.
+
+        GitHub issues are public. Use only a minimized synthetic sequence or a sequence that is already public. Do not submit patient-derived, human-identifiable, clinical, proprietary, embargoed, credential-bearing, unpublished, or otherwise sensitive data.
+
+        For a suspected security vulnerability, use [private vulnerability reporting](https://github.com/madhusudan-kulkarni/computase/security/advisories/new) instead of this form.
+
+  - type: input
+    id: version
+    attributes:
+      label: Computase version
+      description: Run `python -c "import computase; print(computase.__version__)"`.
+      placeholder: "For example: 1.2.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operation
+    attributes:
+      label: Operation
+      options:
+        - summarize_sequence / computase_summarize_sequence
+        - reverse_complement / computase_reverse_complement
+        - translate_sequence / computase_translate_sequence
+        - enumerate_orfs / computase_enumerate_orfs
+        - scan_motif / computase_scan_motif
+    validations:
+      required: true
+
+  - type: textarea
+    id: sequence
+    attributes:
+      label: Minimized non-sensitive sequence
+      description: Provide raw sequence or one FASTA record, with no sensitive identifiers.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: parameters
+    attributes:
+      label: Parameters
+      description: Include all effective parameters, or `{}` if every parameter used its default.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+      description: Include the relevant output fields and coordinates.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result and coordinate convention
+      description: State the expected value, strand, indexing origin, and end-coordinate convention.
+    validations:
+      required: true
+
+  - type: input
+    id: reference
+    attributes:
+      label: Independent reference
+      description: Link an accession, publication, specification, or independently calculated result.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: disclosure
+    attributes:
+      label: Public-data confirmation
+      options:
+        - label: I confirm that the sequence and metadata are safe to disclose publicly.
+          required: true
