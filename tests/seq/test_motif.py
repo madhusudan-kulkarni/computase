@@ -35,6 +35,11 @@ def test_iupac_pattern_and_overlap_policies() -> None:
     assert [match.start for match in scan_motif("AAAA", "AAA", overlapping=False).matches] == [0]
 
 
+def test_iupac_target_symbols_match_compatible_patterns() -> None:
+    assert [match.start for match in scan_motif("AAN", "AAR").matches] == [0]
+    assert scan_motif("AAR", "AAY").matches == []
+
+
 def test_truthful_match_limit() -> None:
     result = scan_motif("AAAA", "A", max_matches=2)
 
@@ -54,6 +59,10 @@ def test_motif_result_records_parameters_without_input() -> None:
     }
     assert result.coordinate_system == "0-based-half-open"
     assert "sequence" not in result.model_dump()
+
+
+def test_motif_fasta_matches_raw_input() -> None:
+    assert scan_motif(">record\nAA GC AA\n", "AAR") == scan_motif("AAGCAA", "AAR")
 
 
 def test_rejects_invalid_pattern_and_limits() -> None:

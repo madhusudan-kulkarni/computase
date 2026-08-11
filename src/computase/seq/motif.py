@@ -2,6 +2,8 @@
 
 from typing import Literal
 
+from Bio.Seq import Seq
+
 from computase.core.validation import (
     MAX_MOTIF_MATCHES,
     MAX_MOTIF_PATTERN_LENGTH,
@@ -31,24 +33,6 @@ _IUPAC_EXPANSION: dict[str, frozenset[str]] = {
     "V": frozenset("ACG"),
     "N": frozenset("ACGTU"),
 }
-_COMPLEMENT = {
-    "A": "T",
-    "C": "G",
-    "G": "C",
-    "T": "A",
-    "U": "A",
-    "R": "Y",
-    "Y": "R",
-    "S": "S",
-    "W": "W",
-    "K": "M",
-    "M": "K",
-    "B": "V",
-    "D": "H",
-    "H": "D",
-    "V": "B",
-    "N": "N",
-}
 
 
 def _normalize_motif(motif: str) -> str:
@@ -69,7 +53,7 @@ def _normalize_motif(motif: str) -> str:
 
 
 def _reverse_complement_pattern(motif: str) -> str:
-    return "".join(_COMPLEMENT[code] for code in reversed(motif))
+    return str(Seq(motif).reverse_complement())
 
 
 def _find_intervals(
@@ -78,19 +62,28 @@ def _find_intervals(
     overlapping: bool,
     retain: int,
 ) -> tuple[int, list[tuple[int, int]]]:
-    pattern = [_IUPAC_EXPANSION[code] for code in motif]
-    pattern_length = len(pattern)
+    pattern_length = len(motif)
+    symbol_masks = dict.fromkeys(_IUPAC_EXPANSION, 0)
+    for offset, code in enumerate(motif):
+        pattern_residues = _IUPAC_EXPANSION[code]
+        bit = 1 << offset
+        for sequence_code, sequence_residues in _IUPAC_EXPANSION.items():
+            if pattern_residues & sequence_residues:
+                symbol_masks[sequence_code] |= bit
+
+    match_bit = 1 << (pattern_length - 1)
     intervals: list[tuple[int, int]] = []
     total = 0
-    position = 0
-    while position + pattern_length <= len(sequence):
-        if all(sequence[position + offset] in allowed for offset, allowed in enumerate(pattern)):
+    state = 0
+    for position, code in enumerate(sequence):
+        state = ((state << 1) | 1) & symbol_masks[code]
+        if state & match_bit:
             total += 1
+            start = position - pattern_length + 1
             if len(intervals) < retain:
-                intervals.append((position, position + pattern_length))
-            position += 1 if overlapping else pattern_length
-        else:
-            position += 1
+                intervals.append((start, position + 1))
+            if not overlapping:
+                state = 0
     return total, intervals
 
 

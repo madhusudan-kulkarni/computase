@@ -59,7 +59,8 @@ Connect an MCP client to `http://127.0.0.1:8000/mcp`. HTTP binds to localhost by
 ## Scientific conventions
 
 - Coordinates are 0-based and end-exclusive on the forward reference.
-- Strand is reported separately; `sequence[start:end]` reproduces each reported forward span.
+- Coordinates index the normalized sequence after FASTA headers and whitespace are removed.
+- Strand is reported separately; `normalized_sequence[start:end]` reproduces each forward span.
 - ORFs are candidates, not gene predictions.
 - IUPAC GC bounds preserve uncertainty rather than assigning probabilities.
 - Sequence length is capped at 5,000,000 nucleotides; motif and result limits are enforced.

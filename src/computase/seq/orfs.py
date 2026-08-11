@@ -1,17 +1,23 @@
 """Six-frame candidate open reading frame enumeration."""
 
+import heapq
 from typing import Literal
 
 from Bio.Data import CodonTable
 from Bio.Seq import Seq
 
-from computase.core.validation import MAX_ORF_RESULTS, normalize_sequence
+from computase.core.validation import (
+    MAX_ORF_PROTEIN_RESIDUES,
+    MAX_ORF_RESULTS,
+    normalize_sequence,
+)
 from computase.errors import InvalidParameterError
 
 from .models import Orf, OrfEnumeration
 
 StartCodonPolicy = Literal["table-starts", "atg-only"]
 _START_POLICIES = frozenset({"table-starts", "atg-only"})
+_Candidate = tuple[str, int, int, Literal["+", "-"], int, bool, int]
 
 
 def _validate_parameters(
@@ -127,7 +133,31 @@ def enumerate_orfs(
         frozenset(table.start_codons) if start_codons == "table-starts" else frozenset({"ATG"})
     )
     stop_set = frozenset(table.stop_codons)
-    candidates: list[Orf] = []
+    retained: list[tuple[tuple[int, int, int], tuple[int, int, int], _Candidate]] = []
+    total_found = 0
+    encounter = 0
+
+    def retain_candidate(
+        oriented: str,
+        start: int,
+        end: int,
+        strand: Literal["+", "-"],
+        frame: int,
+        complete: bool,
+    ) -> None:
+        nonlocal encounter, total_found
+        forward_start = start if strand == "+" else len(forward) - end
+        length = end - start
+        rank = (forward_start, -length, encounter)
+        worst_key = (-forward_start, length, -encounter)
+        descriptor: _Candidate = (oriented, start, end, strand, frame, complete, encounter)
+        entry = (worst_key, rank, descriptor)
+        total_found += 1
+        encounter += 1
+        if len(retained) < max_results:
+            heapq.heappush(retained, entry)
+        elif rank < retained[0][1]:
+            heapq.heapreplace(retained, entry)
 
     strands: tuple[tuple[Literal["+", "-"], str], ...] = (
         ("+", forward),
@@ -145,37 +175,47 @@ def enumerate_orfs(
                 if codon in stop_set and active_starts:
                     for start in active_starts:
                         if position + 3 - start >= min_length_nt:
-                            candidates.append(
-                                _candidate(
-                                    oriented,
-                                    len(forward),
-                                    start,
-                                    position + 3,
-                                    strand,
-                                    offset + 1,
-                                    table_id,
-                                    True,
-                                )
+                            retain_candidate(
+                                oriented,
+                                start,
+                                position + 3,
+                                strand,
+                                offset + 1,
+                                True,
                             )
                     active_starts.clear()
             if not require_stop:
                 for start in active_starts:
                     if final_codon_end - start >= min_length_nt:
-                        candidates.append(
-                            _candidate(
-                                oriented,
-                                len(forward),
-                                start,
-                                final_codon_end,
-                                strand,
-                                offset + 1,
-                                table_id,
-                                False,
-                            )
+                        retain_candidate(
+                            oriented,
+                            start,
+                            final_codon_end,
+                            strand,
+                            offset + 1,
+                            False,
                         )
 
-    candidates.sort(key=lambda orf: (orf.start, -orf.length_nt))
-    total_found = len(candidates)
+    selected = sorted(retained, key=lambda entry: entry[1])
+    candidates: list[Orf] = []
+    protein_residues = 0
+    for _, _, (oriented, start, end, strand, frame, complete, _) in selected:
+        protein_length = (end - start) // 3 - int(complete)
+        if protein_residues + protein_length > MAX_ORF_PROTEIN_RESIDUES:
+            break
+        candidates.append(
+            _candidate(
+                oriented,
+                len(forward),
+                start,
+                end,
+                strand,
+                frame,
+                table_id,
+                complete,
+            )
+        )
+        protein_residues += protein_length
     parameters = {
         "table_id": table_id,
         "start_codons": start_codons,
@@ -185,8 +225,8 @@ def enumerate_orfs(
         "max_results": max_results,
     }
     return OrfEnumeration(
-        orfs=candidates[:max_results],
+        orfs=candidates,
         total_found=total_found,
-        truncated=total_found > max_results,
+        truncated=total_found > len(candidates),
         parameters=parameters,
     )

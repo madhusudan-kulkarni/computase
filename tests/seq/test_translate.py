@@ -39,7 +39,7 @@ def test_translate_uses_selected_ncbi_table() -> None:
 
 
 def test_translate_accepts_fasta_rna() -> None:
-    assert translate_sequence(">rna\nAUGGCC\n").protein == "MA"
+    assert translate_sequence(">rna\nAUG GCC\n") == translate_sequence("AUGGCC")
 
 
 def test_translate_rejects_partial_codon() -> None:

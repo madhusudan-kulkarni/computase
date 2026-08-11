@@ -1,5 +1,6 @@
 import pytest
 
+import computase.seq.orfs as orf_module
 from computase.errors import InvalidParameterError
 from computase.seq import enumerate_orfs, reverse_complement
 
@@ -17,7 +18,12 @@ def test_enumerates_all_six_frames(frame: int, strand: str) -> None:
     assert result.orfs[0].frame == frame
     assert result.orfs[0].protein == "MK"
     assert result.orfs[0].complete is True
-    assert sequence[result.orfs[0].start : result.orfs[0].end]
+    expected_coordinates = (frame - 1, frame + 8) if strand == "+" else (0, 9)
+    assert (result.orfs[0].start, result.orfs[0].end) == expected_coordinates
+    expected_span = oriented[frame - 1 : frame + 8]
+    if strand == "-":
+        expected_span = reverse_complement(expected_span).reverse_complement
+    assert sequence[result.orfs[0].start : result.orfs[0].end] == expected_span
     assert result.coordinate_system == "0-based-half-open"
 
 
@@ -27,6 +33,11 @@ def test_nested_starts_are_optional() -> None:
 
     assert [(orf.start, orf.end) for orf in outer_only.orfs] == [(0, 12)]
     assert [(orf.start, orf.end) for orf in nested.orfs] == [(0, 12), (3, 12)]
+
+
+def test_orf_fasta_matches_raw_input() -> None:
+    raw = enumerate_orfs("ATGAAATAA", min_length_nt=3)
+    assert enumerate_orfs(">record\nATG AAA TAA\n", min_length_nt=3) == raw
 
 
 def test_open_ended_orf_policy() -> None:
@@ -63,6 +74,23 @@ def test_truthful_truncation_and_ordering() -> None:
     assert result.truncated is True
     assert len(result.orfs) == 1
     assert result.orfs[0].start == 0
+
+
+def test_truthful_truncation_when_protein_output_budget_is_reached(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(orf_module, "MAX_ORF_PROTEIN_RESIDUES", 2)
+
+    result = enumerate_orfs(
+        "ATGAAATAAATGAAATAA",
+        min_length_nt=3,
+        max_results=10,
+    )
+
+    assert result.total_found == 2
+    assert result.truncated is True
+    assert len(result.orfs) == 1
+    assert result.orfs[0].protein == "MK"
 
 
 def test_orf_result_records_effective_parameters_without_input() -> None:
