@@ -9,6 +9,7 @@ PUBLIC_MARKDOWN = {
     "CHANGELOG.md",
     "CONTRIBUTING.md",
     "ROADMAP.md",
+    "docs/python-examples.md",
     "skills/computase/SKILL.md",
     "skills/computase/references/usage-examples.md",
 }
@@ -22,7 +23,11 @@ TOOL_NAMES = {
 
 
 def test_public_markdown_inventory_is_exact() -> None:
-    candidates = list(ROOT.glob("*.md")) + list((ROOT / "skills").rglob("*.md"))
+    candidates = (
+        list(ROOT.glob("*.md"))
+        + list((ROOT / "docs").rglob("*.md"))
+        + list((ROOT / "skills").rglob("*.md"))
+    )
     paths = {
         path.relative_to(ROOT).as_posix()
         for path in candidates
