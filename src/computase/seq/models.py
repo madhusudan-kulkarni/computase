@@ -63,3 +63,28 @@ class TranslationResult(ProvenanceModel):
     stopped_early: bool = Field(
         description="Whether translation was truncated at an encountered stop codon."
     )
+
+
+class Orf(ProvenanceModel):
+    """One candidate open reading frame."""
+
+    start: int = Field(ge=0, description="Forward-reference start coordinate.")
+    end: int = Field(gt=0, description="Forward-reference end-exclusive coordinate.")
+    strand: Literal["+", "-"] = Field(description="Coding strand.")
+    frame: int = Field(ge=1, le=3, description="Reading frame relative to the coding strand.")
+    length_nt: int = Field(ge=3, description="Candidate length in nucleotides.")
+    protein: str = Field(description="Translated protein without a terminal stop marker.")
+    complete: bool = Field(description="Whether an in-frame terminal stop codon was found.")
+
+
+class OrfEnumeration(ProvenanceModel):
+    """Bounded collection of candidate open reading frames."""
+
+    orfs: list[Orf] = Field(description="Candidate ORFs in deterministic coordinate order.")
+    total_found: int = Field(ge=0, description="Total candidates found before result limiting.")
+    truncated: bool = Field(description="Whether candidates were omitted by max_results.")
+    coordinate_system: Literal["0-based-half-open"] = "0-based-half-open"
+    note: str = Field(
+        default="These are candidate ORFs, not gene predictions.",
+        description="Scientific interpretation boundary.",
+    )
