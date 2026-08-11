@@ -21,11 +21,11 @@ jobs:
       - name: Install project
         run: uv sync --locked --extra dev
       - name: Check formatting
-        run: uv run --locked ruff format --check src tests evaluations scripts
+        run: uv run --locked ruff format --check src tests evaluations scripts skills/computase/scripts
       - name: Lint
-        run: uv run --locked ruff check src tests evaluations scripts
+        run: uv run --locked ruff check src tests evaluations scripts skills/computase/scripts
       - name: Type-check
-        run: uv run --locked mypy src tests evaluations scripts
+        run: uv run --locked mypy src tests evaluations scripts skills/computase/scripts
 
   test:
     runs-on: ubuntu-latest

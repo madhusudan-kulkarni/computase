@@ -42,6 +42,11 @@ def test_skill_references_exact_tool_inventory() -> None:
 
     assert all(f"`{name}`" in skill for name in TOOL_NAMES)
     assert "stats_" not in skill
+    assert "uv run --script skills/computase/scripts/run.py" in skill
+    assert "never mutate the active project or global Python" in skill
+    assert (ROOT / "skills/computase/scripts/run.py").is_file()
+    assert "Present results" in skill
+    assert "raw output" in skill
 
 
 def test_citation_matches_release_identity() -> None:

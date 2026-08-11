@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Hardened the companion Skill with an isolated `uv` fallback runner, a concise
+  scientific presentation contract, and skills.sh installation guidance.
+
 ## [0.1.1] - 2026-08-11
 
 - Improved scientist-facing installation guidance, scientific conventions, and
