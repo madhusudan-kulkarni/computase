@@ -54,6 +54,9 @@ Representative output (`computase_version` matches the installed release):
 Results are typed Pydantic models. They record the Computase version and effective
 parameters, but never echo the full input sequence.
 
+See the [Python examples](https://github.com/madhusudan-kulkarni/computase/blob/main/docs/python-examples.md)
+for concise, runnable examples of all five sequence operations.
+
 ## Capabilities and validation
 
 | Scientific task | Python function | Contract and validation evidence |
@@ -137,14 +140,16 @@ uv run --locked pytest -q
 uv run --locked python -m evaluations.runner
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for reference-vector requirements.
+See [CONTRIBUTING.md](https://github.com/madhusudan-kulkarni/computase/blob/main/CONTRIBUTING.md)
+for reference-vector requirements.
 
 ## Citation
 
 If Computase contributes to your work, cite the software metadata in
-[CITATION.cff](CITATION.cff). GitHub also exposes this through **Cite this
-repository**.
+[CITATION.cff](https://github.com/madhusudan-kulkarni/computase/blob/main/CITATION.cff).
+GitHub also exposes this through **Cite this repository**.
 
 ## License
 
-Computase is licensed under the [MIT License](LICENSE).
+Computase is licensed under the
+[MIT License](https://github.com/madhusudan-kulkarni/computase/blob/main/LICENSE).

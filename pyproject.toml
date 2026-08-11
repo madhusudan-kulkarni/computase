@@ -32,6 +32,8 @@ dependencies = [
 computase = "computase.mcp.server:main"
 
 [project.urls]
+Changelog = "https://github.com/madhusudan-kulkarni/computase/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/madhusudan-kulkarni/computase/blob/main/docs/python-examples.md"
 Homepage = "https://github.com/madhusudan-kulkarni/computase"
 Issues = "https://github.com/madhusudan-kulkarni/computase/issues"
 Repository = "https://github.com/madhusudan-kulkarni/computase"

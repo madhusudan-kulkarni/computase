@@ -21,6 +21,11 @@ htmlcov/
 .venv/
 venv/
 
+# Local environment files
+.env
+.env.*
+!.env.example
+
 # Editors and operating systems
 .idea/
 .vscode/
