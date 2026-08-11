@@ -38,3 +38,13 @@ class SequenceSummary(ProvenanceModel):
     gc_skew: float | None = Field(
         description="Concrete-base (G-C)/(G+C), or null when no concrete G/C exists."
     )
+
+
+class ReverseComplementResult(ProvenanceModel):
+    """Reverse complement of a nucleotide sequence."""
+
+    sequence_type: Literal["dna", "rna"] = Field(description="Detected nucleotide alphabet.")
+    length: int = Field(ge=1, description="Normalized input sequence length.")
+    reverse_complement: str = Field(
+        description="Reverse complement in the same DNA or RNA alphabet."
+    )
