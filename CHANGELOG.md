@@ -2,8 +2,11 @@
 
 ## [Unreleased]
 
-- Hardened the companion Skill with an isolated `uv` fallback runner, a concise
-  scientific presentation contract, and skills.sh installation guidance.
+- Added `--version` to the `computase` CLI and added CLI argument unit tests.
+- Added repository branding icon and bio.tools badge to documentation.
+- Added Roadmap links in README and package URLs.
+- Added `coverage` and `pytest-cov` to optional development dependencies.
+- Hardened the companion Skill with an isolated `uv` fallback runner and skills.sh installation guidance.
 - Registered Computase on bio.tools and persisted the published `biotoolsID`.
 
 ## [0.1.1] - 2026-08-11

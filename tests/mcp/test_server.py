@@ -5,7 +5,7 @@ from typing import Any
 from mcp.client.client import Client
 
 from computase import __version__
-from computase.mcp.server import server
+from computase.mcp.server import build_parser, main, server
 
 TOOL_NAMES = {
     "computase_summarize_sequence",
@@ -96,3 +96,57 @@ async def test_public_validation_errors_are_actionable_tool_errors() -> None:
         result = await _call(name, arguments)
         assert result.is_error is True
         assert expected_message in result.content[0].text
+
+
+def test_build_parser_defaults() -> None:
+    parser = build_parser()
+    args = parser.parse_args([])
+    assert args.transport == "stdio"
+    assert args.host == "127.0.0.1"
+    assert args.port == 8000
+
+
+def test_build_parser_streamable_http() -> None:
+    parser = build_parser()
+    args = parser.parse_args(
+        ["--transport", "streamable-http", "--host", "0.0.0.0", "--port", "9000"]
+    )
+    assert args.transport == "streamable-http"
+    assert args.host == "0.0.0.0"
+    assert args.port == 9000
+
+
+def test_build_parser_version(capsys: Any) -> None:
+    parser = build_parser()
+    try:
+        parser.parse_args(["--version"])
+    except SystemExit as exc:
+        assert exc.code == 0
+    captured = capsys.readouterr()
+    assert __version__ in captured.out or __version__ in captured.err
+
+
+def test_main_stdio(monkeypatch: Any) -> None:
+    called_with: dict[str, Any] = {}
+
+    def mock_run(**kwargs: Any) -> None:
+        called_with.update(kwargs)
+
+    monkeypatch.setattr(server, "run", mock_run)
+    main([])
+    assert called_with == {"transport": "stdio"}
+
+
+def test_main_streamable_http(monkeypatch: Any) -> None:
+    called_with: dict[str, Any] = {}
+
+    def mock_run(**kwargs: Any) -> None:
+        called_with.update(kwargs)
+
+    monkeypatch.setattr(server, "run", mock_run)
+    main(["--transport", "streamable-http", "--host", "127.0.0.1", "--port", "8080"])
+    assert called_with == {
+        "transport": "streamable-http",
+        "host": "127.0.0.1",
+        "port": 8080,
+    }

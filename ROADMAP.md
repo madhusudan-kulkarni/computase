@@ -1,36 +1,37 @@
 # Computase roadmap
 
-Planned work beyond the 0.1.0 release. Items here are directions, not commitments; ordering reflects current priority.
+Planned work beyond the 0.1.x series. Items here are directions, not commitments. Ordering reflects current priority.
 
-Guiding rule for every future feature: it must keep the Computase distinctive value — verified computation with independent test vectors, explicit coordinate contracts, honest truncation metadata, and provenance fields. No thin BioPython wrappers without that added layer.
+Every future feature must keep what makes Computase useful: verified computation with independent test vectors, explicit coordinate contracts, truthful truncation metadata, and provenance fields. No thin Biopython wrappers without that layer.
 
-## 0.2.0 — high-frequency lab tools
+## 0.2.0: Common lab tools
 
-- Primer/oligo analysis: melting temperature (published Tm methods via `Bio.SeqUtils.MeltingTemp`), GC clamp, self-complementarity checks
-- Restriction digestion via `Bio.Restriction`: cut sites, fragment sizes, unique cutters, using the same coordinate contract
-- Protein sequence properties via `Bio.SeqUtils.ProtParam`: molecular weight, isoelectric point, extinction coefficient, instability index (pairs with `translate_sequence`)
+- Primer and oligo analysis: melting temperature with published Tm methods from `Bio.SeqUtils.MeltingTemp`, GC clamp, self-complementarity checks
+- Restriction digestion via `Bio.Restriction`: cut sites, fragment sizes, and unique cutters, using the forward-reference coordinate contract
+- Protein sequence properties via `Bio.SeqUtils.ProtParam`: molecular weight, isoelectric point, extinction coefficient, instability index
 - Codon-usage tables and CAI from coding sequences
 - Human CLI subcommands (`computase revcomp ...`, JSON output) alongside the MCP server
 
-## 0.3.0 — alignment and files
+## 0.3.0: Alignment and file parsing
 
-- Pairwise alignment via `Bio.Align.PairwiseAligner` (global/local, selectable scoring); large enough to anchor its own release
-- GenBank/FASTA/FASTQ record parsing via `Bio.SeqIO`: record summaries, feature/CDS extraction by coordinate
+- Pairwise alignment via `Bio.Align.PairwiseAligner` with global or local modes and selectable scoring
+- GenBank, FASTA, and FASTQ parsing via `Bio.SeqIO`: record summaries, feature and CDS extraction by coordinate
 - Multi-record FASTA input with per-record results
-- Open question (decide at the time): NCBI Entrez fetch by accession — enables end-to-end agent workflows but breaks the "verified local computation" positioning; if added, ship as a clearly separated non-idempotent network tool
+- Open question: NCBI Entrez fetching by accession. This enables agent workflows but requires network calls. If added, ship it as a distinct network tool with explicit timeouts.
 
-## Web app — flagship phase
+## Web app: Client-side tool
 
-- Preferred approach: fully client-side via Pyodide/WASM — no server, no hosting cost, no data leaves the user's machine, which extends the local-computation story
-- Sequence visualizations: linear feature maps, ORF/motif tracks, GC-skew plots, circular plasmid-style SVG maps
-- Fallback approach if Pyodide proves impractical: FastAPI over the same core plus a React frontend
+- Preferred approach: run client-side in the browser with Pyodide and WebAssembly. No server, no hosting cost, and no sequence data leaves the machine.
+- Visualizations: linear feature maps, ORF and motif tracks, GC skew plots, circular plasmid SVG maps
+- Fallback approach: FastAPI backend with a React interface if WebAssembly bundles prove too large
 
-## Community and credibility
+## Community
 
-- Benchmark write-up: LLM accuracy on sequence tasks with vs. without Computase MCP tools, published as a blog post or repo page
-- Zenodo DOI archiving, then a JOSS submission once the API is stable
-- Conda-forge packaging once PyPI distribution is stable
+- Benchmark report: LLM accuracy on sequence tasks with and without Computase MCP tools
+- Zenodo DOI archiving and a JOSS submission once the API stabilizes
+- Conda-forge package distribution
 
 ## Non-goals
 
-- Phylogenetics, BLAST wrappers, protein structure analysis, NGS pipelines — heavy dependencies, external binaries, or long-running jobs that do not fit the fast, verified, local, agent-callable shape
+- Phylogenetics, BLAST wrappers, protein structure prediction, and NGS pipelines. These require heavy dependencies, external binaries, or long-running jobs that do not fit a fast, verified local library.
+

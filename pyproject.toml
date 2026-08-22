@@ -37,13 +37,16 @@ Documentation = "https://github.com/madhusudan-kulkarni/computase/blob/main/docs
 Homepage = "https://github.com/madhusudan-kulkarni/computase"
 Issues = "https://github.com/madhusudan-kulkarni/computase/issues"
 Repository = "https://github.com/madhusudan-kulkarni/computase"
+Roadmap = "https://github.com/madhusudan-kulkarni/computase/blob/main/ROADMAP.md"
 
 [project.optional-dependencies]
 dev = [
+    "coverage>=7.0",
     "hypothesis>=6.0",
     "mypy>=1.10",
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
     "ruff>=0.6",
 ]
 
@@ -58,7 +61,7 @@ packages = ["src/computase"]
 include = [
     "src/computase",
     "skills/computase",
-    "docs/python-examples.md",
+    "docs",
     "README.md",
     "LICENSE",
     "pyproject.toml",
