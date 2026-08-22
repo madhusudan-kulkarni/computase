@@ -1,6 +1,6 @@
 [project]
 name = "computase"
-version = "0.1.1"
+version = "0.1.2"
 description = "Local DNA and RNA sequence utilities for Python and MCP."
 readme = "README.md"
 requires-python = ">=3.11"

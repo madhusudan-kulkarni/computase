@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.1.2] - 2026-08-22
 
 - Added `--version` to the `computase` CLI and added CLI argument unit tests.
 - Added repository branding icon and bio.tools badge to documentation.
