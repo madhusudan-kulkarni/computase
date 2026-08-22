@@ -1,8 +1,13 @@
+<p align="center">
+  <img src="docs/assets/logo.jpg" alt="Computase Logo" width="160" />
+</p>
+
 # Computase
 
 [![PyPI](https://img.shields.io/pypi/v/computase)](https://pypi.org/project/computase/)
 [![Python](https://img.shields.io/pypi/pyversions/computase)](https://pypi.org/project/computase/)
 [![CI](https://github.com/madhusudan-kulkarni/computase/actions/workflows/ci.yml/badge.svg)](https://github.com/madhusudan-kulkarni/computase/actions/workflows/ci.yml)
+[![bio.tools](https://img.shields.io/badge/bio.tools-computase-blue)](https://bio.tools/computase)
 
 Computase is a local Python library for small, well-defined DNA and RNA sequence
 calculations:
@@ -159,6 +164,10 @@ uv run --locked python -m evaluations.runner
 
 See [CONTRIBUTING.md](https://github.com/madhusudan-kulkarni/computase/blob/main/CONTRIBUTING.md)
 for reference-vector requirements.
+
+## Roadmap
+
+See [ROADMAP.md](https://github.com/madhusudan-kulkarni/computase/blob/main/ROADMAP.md) for planned capabilities, including melting temperature calculations, restriction digestions, and a client-side WebAssembly interface.
 
 ## Citation
 

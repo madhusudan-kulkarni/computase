@@ -5,7 +5,7 @@
     "description": "Local Python sequence utilities for nucleotide composition, DNA and RNA reverse complements, NCBI genetic-code translation, six-frame candidate ORF enumeration, and IUPAC motif searches. Computase accepts raw nucleotide strings or one FASTA record and returns structured, bounded results with explicit scientific conventions.",
     "homepage": "https://github.com/madhusudan-kulkarni/computase",
     "version": [
-      "0.1.1"
+      "0.1.2"
     ],
     "toolType": [
       "Library"
@@ -268,12 +268,12 @@
       {
         "url": "https://pypi.org/project/computase/",
         "type": "Software package",
-        "version": "0.1.1"
+        "version": "0.1.2"
       },
       {
-        "url": "https://github.com/madhusudan-kulkarni/computase/archive/refs/tags/v0.1.1.tar.gz",
+        "url": "https://github.com/madhusudan-kulkarni/computase/archive/refs/tags/v0.1.2.tar.gz",
         "type": "Source code",
-        "version": "0.1.1"
+        "version": "0.1.2"
       }
     ],
     "documentation": [

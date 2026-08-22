@@ -28,6 +28,11 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the Computase server command-line parser."""
     parser = argparse.ArgumentParser(description="Computase MCP server")
     parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
+    parser.add_argument(
         "--transport",
         choices=["stdio", "streamable-http"],
         default="stdio",
